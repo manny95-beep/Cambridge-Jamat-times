@@ -5,178 +5,99 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cambridge Jamat Times</title>
 <style>
-
-    body {
-
-      font-family: Arial, sans-serif;
-
-      background: #f4f4f4;
-
-      color: #333;
-
-      margin: 0;
-
-      padding: 20px;
-
-    }
-
-    h1 {
-
-      text-align: center;
-
-    }
-
-    .date {
-
-      text-align: center;
-
-      margin-bottom: 30px;
-
-      font-size: 20px;
-
-    }
-
-    .mosque {
-
-      background: white;
-
-      padding: 15px;
-
-      border-radius: 6px;
-
-      margin-bottom: 15px;
-
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-
-    }
-
-    .mosque h2 {
-
-      margin: 0 0 10px 0;
-
-      color: #00796b;
-
-    }
+   body {
+     font-family: Arial, sans-serif;
+     background: #f8f9fa;
+     color: #333;
+     margin: 40px;
+     text-align: center;
+   }
+   h1 {
+     color: #006241;
+     margin-bottom: 10px;
+   }
+   p {
+     font-size: 18px;
+     margin-bottom: 30px;
+   }
+   table {
+     width: 100%;
+     max-width: 700px;
+     margin: 0 auto;
+     border-collapse: collapse;
+     background: white;
+     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+   }
+   th, td {
+     padding: 12px;
+     border: 1px solid #ddd;
+   }
+   th {
+     background: #006241;
+     color: white;
+   }
+   tr:nth-child(even) {
+     background: #f2f2f2;
+   }
 </style>
 </head>
 <body>
-    <div id="prayer-times"></div>
-
-<script>
-// JavaScript code that fetches prayer times from Google Sheets
-const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_7eZo7CyIssKS69UcktG__1SsJr00VPTxbYxfazu05DzD8-K_UWpI6lYdKE2XYlU3Q7bDBxz8XHXv/pub?gid=0&single=true&output=csv';
-
-fetch(sheetUrl)
-  .then(response => response.text())
-  .then(csv => {
-    const lines = csv.split('\\n');
-    const headers = lines[0].split(',');
-    const container = document.getElementById('prayer-times');
-    container.innerHTML = `<h2>Prayer Times</h2>`;
-
-    for (let i = 1; i < lines.length; i++) {
-      const row = lines[i].split(',');
-      if (row.length < 6) continue;
-
-      const mosqueName = row[0];
-      const times = headers.slice(1).map((h, idx) => `<li><strong>${h}:</strong> ${row[idx + 1]}</li>`).join('');
-
-      container.innerHTML += `<h3>${mosqueName}</h3><ul>${times}</ul>`;
-    }
-  })
-  .catch(error => {
-    document.getElementById('prayer-times').innerText = 'Could not load prayer times.';
-    console.error('Error:', error);
-  });
-</script>
 <h1>Cambridge Jamat Times</h1>
-<div class="date" id="today-date"></div>
-<div class="mosque">
-<h2>Omar Faruque Mosque</h2>
-<p>Loading today's jamat times...</p>
-<a href="https://www.omarfaruquemosque.org.uk/index.php?section=1" target="_blank">View mosque site</a>
-</div>
-<div class="mosque">
-<h2>Cambridge Central Mosque</h2>
-<p>Loading today's jamat times...</p>
-<a href="https://cambridgecentralmosque.org/" target="_blank">View mosque site</a>
-</div>
-<div class="mosque">
-<h2>Abu Bakr Mosque (Cambridge Mosque)</h2>
-<p>Loading today's jamat times...</p>
-<a href="https://www.cambridgemosque.com/" target="_blank">View mosque site</a>
-</div>
-<div class="mosque">
-<h2>Cambridge Islamic Centre</h2>
-<p>Loading today's jamat times...</p>
-<a href="https://cambridgeislamiccentre.org/" target="_blank">View mosque site</a>
-</div>
+<p id="today"></p>
+<table id="times">
+<thead>
+<tr>
+<th>Mosque</th>
+<th>Fajr</th>
+<th>Dhuhr</th>
+<th>Asr</th>
+<th>Maghrib</th>
+<th>Isha</th>
+</tr>
+</thead>
+<tbody>
+<tr><td colspan="6">Loading today's jamat times...</td></tr>
+</tbody>
+</table>
 <script>
-
-    // Show today's date
-
-    const today = new Date();
-
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-
-    document.getElementById('today-date').textContent = today.toLocaleDateString('en-GB', options);
+   // 1. Display today's date
+   const today = new Date();
+   const todayStr = today.toLocaleDateString("en-GB"); // format: DD/MM/YYYY
+   document.getElementById("today").textContent = `Today's Date: ${todayStr}`;
+   // 2. Your Google Sheet CSV link
+   const sheetUrl = "https://docs.google.com/spreadsheets/d/1dUXSVifdaugwxLGK1kG8a3r3Y-QWAJ1mB-JVnXsofXk/gviz/tq?tqx=out:csv";
+   // 3. Fetch and display data
+   fetch(sheetUrl)
+     .then(res => res.text())
+     .then(csv => {
+       const rows = csv.split("\n").map(r => r.split(","));
+       const tbody = document.querySelector("#times tbody");
+       tbody.innerHTML = ""; // clear "loading" row
+       let found = false;
+       rows.slice(1).forEach(row => {
+         const date = row[0]?.trim();
+         if (date === todayStr) {
+           const tr = document.createElement("tr");
+           tr.innerHTML = `
+<td>${row[1] || ""}</td>
+<td>${row[2] || ""}</td>
+<td>${row[3] || ""}</td>
+<td>${row[4] || ""}</td>
+<td>${row[5] || ""}</td>
+<td>${row[6] || ""}</td>
+           `;
+           tbody.appendChild(tr);
+           found = true;
+         }
+       });
+       if (!found) {
+         tbody.innerHTML = `<tr><td colspan="6">No jamat times found for today.</td></tr>`;
+       }
+     })
+     .catch(err => {
+       console.error("Error loading sheet:", err);
+       document.querySelector("#times tbody").innerHTML = `<tr><td colspan="6">Error loading data.</td></tr>`;
+     });
 </script>
 </body>
 </html>
-<div id="prayer-times"></div>
-
-<script>
-fetch('jamat_times.json')
-  .then(response => response.json())
-  .then(data => {
-    const container = document.getElementById('prayer-times');
-    container.innerHTML = `<h2>Prayer Times for ${data.date}</h2>`;
-    
-    data.mosques.forEach(mosque => {
-      const timesList = Object.entries(mosque.times)
-        .map(([prayer, time]) => `<li><strong>${prayer}:</strong> ${time}</li>`)
-        .join('');
-      
-      container.innerHTML += `
-        <h3>${mosque.mosque}</h3>
-        <ul>${timesList}</ul>
-      `;
-    });
-  })
-  .catch(error => {
-    document.getElementById('prayer-times').innerText = 'Could not load prayer times.';
-    console.error('Error loading prayer times:', error);
-  });
-</script>
- <div id="prayer-times"></div>
-
-<script>
-const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_7eZo7CyIssKS69UcktG__1SsJr00VPTxbYxfazu05DzD8-K_UWpI6lYdKE2XYlU3Q7bDBxz8XHXv/pub?gid=0&single=true&output=csv';
-
-fetch(sheetUrl)
-  .then(response => response.text())
-  .then(csv => {
-    const lines = csv.split('\n');
-    const headers = lines[0].split(',');
-    const container = document.getElementById('prayer-times');
-    container.innerHTML = `<h2>Prayer Times</h2>`;
-
-    for (let i = 1; i < lines.length; i++) {
-      const row = lines[i].split(',');
-      if (row.length < 6) continue;
-
-      const mosqueName = row[0];
-      const times = headers.slice(1).map((h, idx) => `<li><strong>${h}:</strong> ${row[idx + 1]}</li>`).join('');
-
-      container.innerHTML += `<h3>${mosqueName}</h3><ul>${times}</ul>`;
-    }
-  })
-  .catch(error => {
-    document.getElementById('prayer-times').innerText = 'Could not load prayer times.';
-    console.error('Error:', error);
-  });
-</script>
-
-
-
-
