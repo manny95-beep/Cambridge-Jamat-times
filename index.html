@@ -60,6 +60,35 @@
 </style>
 </head>
 <body>
+    <div id="prayer-times"></div>
+
+<script>
+// JavaScript code that fetches prayer times from Google Sheets
+const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_7eZo7CyIssKS69UcktG__1SsJr00VPTxbYxfazu05DzD8-K_UWpI6lYdKE2XYlU3Q7bDBxz8XHXv/pub?gid=0&single=true&output=csv';
+
+fetch(sheetUrl)
+  .then(response => response.text())
+  .then(csv => {
+    const lines = csv.split('\\n');
+    const headers = lines[0].split(',');
+    const container = document.getElementById('prayer-times');
+    container.innerHTML = `<h2>Prayer Times</h2>`;
+
+    for (let i = 1; i < lines.length; i++) {
+      const row = lines[i].split(',');
+      if (row.length < 6) continue;
+
+      const mosqueName = row[0];
+      const times = headers.slice(1).map((h, idx) => `<li><strong>${h}:</strong> ${row[idx + 1]}</li>`).join('');
+
+      container.innerHTML += `<h3>${mosqueName}</h3><ul>${times}</ul>`;
+    }
+  })
+  .catch(error => {
+    document.getElementById('prayer-times').innerText = 'Could not load prayer times.';
+    console.error('Error:', error);
+  });
+</script>
 <h1>Cambridge Jamat Times</h1>
 <div class="date" id="today-date"></div>
 <div class="mosque">
@@ -119,7 +148,35 @@ fetch('jamat_times.json')
     console.error('Error loading prayer times:', error);
   });
 </script>
- 
+ <div id="prayer-times"></div>
+
+<script>
+const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_7eZo7CyIssKS69UcktG__1SsJr00VPTxbYxfazu05DzD8-K_UWpI6lYdKE2XYlU3Q7bDBxz8XHXv/pub?gid=0&single=true&output=csv';
+
+fetch(sheetUrl)
+  .then(response => response.text())
+  .then(csv => {
+    const lines = csv.split('\n');
+    const headers = lines[0].split(',');
+    const container = document.getElementById('prayer-times');
+    container.innerHTML = `<h2>Prayer Times</h2>`;
+
+    for (let i = 1; i < lines.length; i++) {
+      const row = lines[i].split(',');
+      if (row.length < 6) continue;
+
+      const mosqueName = row[0];
+      const times = headers.slice(1).map((h, idx) => `<li><strong>${h}:</strong> ${row[idx + 1]}</li>`).join('');
+
+      container.innerHTML += `<h3>${mosqueName}</h3><ul>${times}</ul>`;
+    }
+  })
+  .catch(error => {
+    document.getElementById('prayer-times').innerText = 'Could not load prayer times.';
+    console.error('Error:', error);
+  });
+</script>
+
 
 
 
