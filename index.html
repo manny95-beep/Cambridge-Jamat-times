@@ -60,46 +60,54 @@
 </table>
 <div class="error" id="errorMsg"></div>
 <script>
-   const sheetUrl = "https://docs.google.com/spreadsheets/d/1Vxvd7weNO-WDBZqEw9GbOxziPrq_0mq1ZkBL7eyuqLs/gviz/tq?tqx=out:csv";
-   document.getElementById("todayDate").textContent = new Date().toLocaleDateString("en-GB");
-   async function loadData() {
-     try {
-       const response = await fetch(sheetUrl);
-       if (!response.ok) throw new Error("Failed to load Google Sheet");
-       const csv = await response.text();
-       const rows = csv.split("\n").map(r => r.split(","));
-       const today = new Date().toLocaleDateString("en-GB");
-       const tbody = document.getElementById("tableBody");
-       const dateCol = rows[0].indexOf("Date");
-       const fajrCol = rows[0].indexOf("Fajr");
-       const dhuhrCol = rows[0].indexOf("Dhuhr");
-       const asrCol = rows[0].indexOf("Asr");
-       const maghribCol = rows[0].indexOf("Maghrib");
-       const ishaCol = rows[0].indexOf("Isha");
-       const mosqueCol = rows[0].indexOf("Mosque");
-       const todayRows = rows.filter(r => r[dateCol] === today);
-       tbody.innerHTML = "";
-       if (todayRows.length === 0) {
-         tbody.innerHTML = `<tr><td colspan="6">No times found for ${today}</td></tr>`;
-         return;
-       }
-       todayRows.forEach(r => {
-         const tr = document.createElement("tr");
-         tr.innerHTML = `
+ const sheetUrl = "https://docs.google.com/spreadsheets/d/1Vxvd7weNO-WDBZqEw9GbOxziPrq_0mq1ZkBL7eyuqLs/gviz/tq?tqx=out:csv";
+ document.getElementById("todayDate").textContent = new Date().toLocaleDateString("en-GB");
+ async function loadData() {
+   try {
+     const response = await fetch(sheetUrl);
+     if (!response.ok) throw new Error("Failed to load Google Sheet");
+     const csv = await response.text();
+     const rows = csv.split("\n").map(r => r.split(","));
+     const today = new Date();
+     const todayFormatted = today.toLocaleDateString("en-GB").replace(/\s/g, "");
+     const todayAlt = today.toLocaleDateString("en-US").replace(/\s/g, "");
+     const tbody = document.getElementById("tableBody");
+     const headers = rows[0].map(h => h.trim());
+     const dateCol = headers.indexOf("Date");
+     const mosqueCol = headers.indexOf("Mosque");
+     const fajrCol = headers.indexOf("Fajr");
+     const dhuhrCol = headers.indexOf("Zuhr") !== -1 ? headers.indexOf("Zuhr") : headers.indexOf("Dhuhr");
+     const asrCol = headers.indexOf("Asr");
+     const maghribCol = headers.indexOf("Maghrib");
+     const ishaCol = headers.indexOf("Isha");
+     tbody.innerHTML = "";
+     const todayRows = rows.filter((r, i) => {
+       if (i === 0) return false;
+       const dateValue = (r[dateCol] || "").trim().replace(/\s/g, "");
+       return dateValue === todayFormatted || dateValue === todayAlt;
+     });
+     if (todayRows.length === 0) {
+       tbody.innerHTML = `<tr><td colspan="6">No times found for ${todayFormatted}</td></tr>`;
+       return;
+     }
+     todayRows.forEach(r => {
+       const tr = document.createElement("tr");
+       tr.innerHTML = `
 <td>${r[mosqueCol]}</td>
 <td>${r[fajrCol]}</td>
 <td>${r[dhuhrCol]}</td>
 <td>${r[asrCol]}</td>
 <td>${r[maghribCol]}</td>
 <td>${r[ishaCol]}</td>
-         `;
-         tbody.appendChild(tr);
-       });
-     } catch (err) {
-       document.getElementById("errorMsg").textContent = "⚠️ Error loading data — please check your Google Sheet is 'Anyone with the link can view'.";
-     }
+       `;
+       tbody.appendChild(tr);
+     });
+   } catch (err) {
+     document.getElementById("errorMsg").textContent = "⚠️ Error loading data — please check your Google Sheet is 'Anyone with the link can view'.";
    }
-   loadData();
+ }
+ loadData();
 </script>
 </body>
 </html>
+
