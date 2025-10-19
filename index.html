@@ -60,7 +60,7 @@
 </table>
 <div class="error" id="errorMsg"></div>
 <script>
- const sheetUrl = https://docs.google.com/spreadsheets/d/1Vxvd7weNO-WDBZqEw9GbOxziPrq_0mq1ZkBL7eyuqLs/gviz/tq?tqx=out:csv;
+ const sheetUrl = "https://docs.google.com/spreadsheets/d/1Vxvd7weNO-WDBZqEw9GbOxziPrq_0mq1ZkBL7eyuqLs/gviz/tq?tqx=out:csv";
  document.getElementById("todayDate").textContent = new Date().toLocaleDateString("en-GB");
  async function loadData() {
    try {
@@ -68,7 +68,6 @@
      if (!response.ok) throw new Error("Failed to load Google Sheet");
      const csv = await response.text();
      const rows = csv.split("\n").map(r => r.split(",").map(c => c.trim()));
-     // Get today's possible formats
      const today = new Date();
      const todayUK = today.toLocaleDateString("en-GB");
      const todayUS = today.toLocaleDateString("en-US");
@@ -83,7 +82,6 @@
      const ishaCol = headers.indexOf("Isha");
      const tbody = document.getElementById("tableBody");
      tbody.innerHTML = "";
-     // Filter today's rows
      const todayRows = rows.filter((r, i) => {
        if (i === 0) return false;
        const d = r[dateCol];
@@ -114,6 +112,7 @@
 </script>
 </body>
 </html>
+
 
 
 
