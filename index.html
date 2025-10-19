@@ -67,12 +67,13 @@
      const response = await fetch(sheetUrl);
      if (!response.ok) throw new Error("Failed to load Google Sheet");
      const csv = await response.text();
-     const rows = csv.split("\n").map(r => r.split(","));
+     const rows = csv.split("\n").map(r => r.split(",").map(c => c.trim()));
+     // Get today's possible formats
      const today = new Date();
-     const todayFormatted = today.toLocaleDateString("en-GB").replace(/\s/g, "");
-     const todayAlt = today.toLocaleDateString("en-US").replace(/\s/g, "");
-     const tbody = document.getElementById("tableBody");
-     const headers = rows[0].map(h => h.trim());
+     const todayUK = today.toLocaleDateString("en-GB");
+     const todayUS = today.toLocaleDateString("en-US");
+     const todayShort = todayUK.replace(/^0/, '').replace(/\/0/, '/');
+     const headers = rows[0];
      const dateCol = headers.indexOf("Date");
      const mosqueCol = headers.indexOf("Mosque");
      const fajrCol = headers.indexOf("Fajr");
@@ -80,14 +81,16 @@
      const asrCol = headers.indexOf("Asr");
      const maghribCol = headers.indexOf("Maghrib");
      const ishaCol = headers.indexOf("Isha");
+     const tbody = document.getElementById("tableBody");
      tbody.innerHTML = "";
+     // Filter today's rows
      const todayRows = rows.filter((r, i) => {
        if (i === 0) return false;
-       const dateValue = (r[dateCol] || "").trim().replace(/\s/g, "");
-       return dateValue === todayFormatted || dateValue === todayAlt;
+       const d = r[dateCol];
+       return [todayUK, todayUS, todayShort].includes(d);
      });
      if (todayRows.length === 0) {
-       tbody.innerHTML = `<tr><td colspan="6">No times found for ${todayFormatted}</td></tr>`;
+       tbody.innerHTML = `<tr><td colspan="6">No times found for ${todayUK}</td></tr>`;
        return;
      }
      todayRows.forEach(r => {
@@ -103,11 +106,13 @@
        tbody.appendChild(tr);
      });
    } catch (err) {
-     document.getElementById("errorMsg").textContent = "⚠️ Error loading data — please check your Google Sheet is 'Anyone with the link can view'.";
+     document.getElementById("errorMsg").textContent =
+       "⚠️ Error loading data — please check your Google Sheet is public ('Anyone with the link can view').";
    }
  }
  loadData();
 </script>
 </body>
 </html>
+
 
