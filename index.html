@@ -94,4 +94,29 @@
 </script>
 </body>
 </html>
+<div id="prayer-times"></div>
+
+<script>
+fetch('/data/jamat_times.json')
+  .then(response => response.json())
+  .then(data => {
+    const container = document.getElementById('prayer-times');
+    container.innerHTML = `<h2>Prayer Times for ${data.date}</h2>`;
+    
+    data.mosques.forEach(mosque => {
+      const timesList = Object.entries(mosque.times)
+        .map(([prayer, time]) => `<li><strong>${prayer}:</strong> ${time}</li>`)
+        .join('');
+      
+      container.innerHTML += `
+        <h3>${mosque.mosque}</h3>
+        <ul>${timesList}</ul>
+      `;
+    });
+  })
+  .catch(error => {
+    document.getElementById('prayer-times').innerText = 'Could not load prayer times.';
+    console.error('Error loading prayer times:', error);
+  });
+</script>
  
