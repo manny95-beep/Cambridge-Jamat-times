@@ -97,7 +97,7 @@
 <div id="prayer-times"></div>
 
 <script>
-fetch('/data/jamat_times.json')
+fetch('/jamat_times.json')
   .then(response => response.json())
   .then(data => {
     const container = document.getElementById('prayer-times');
@@ -120,3 +120,4 @@ fetch('/data/jamat_times.json')
   });
 </script>
  
+
