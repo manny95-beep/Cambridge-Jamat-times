@@ -1,50 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cambridge Jamat Times</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cambridge Mosque Jamat Times</title>
 <style>
    body {
      font-family: Arial, sans-serif;
-     background: #f8f9fa;
+     background: #f5f7fa;
      color: #333;
-     margin: 40px;
      text-align: center;
+     margin: 0;
+     padding: 20px;
    }
    h1 {
-     color: #006241;
-     margin-bottom: 10px;
-   }
-   p {
-     font-size: 18px;
-     margin-bottom: 30px;
+     color: #006b5b;
    }
    table {
-     width: 100%;
-     max-width: 700px;
-     margin: 0 auto;
+     width: 90%;
+     margin: 20px auto;
      border-collapse: collapse;
      background: white;
-     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+     box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
    }
    th, td {
      padding: 12px;
      border: 1px solid #ddd;
    }
    th {
-     background: #006241;
+     background: #006b5b;
      color: white;
    }
    tr:nth-child(even) {
-     background: #f2f2f2;
+     background: #f9f9f9;
+   }
+   .error {
+     color: red;
+     margin-top: 20px;
    }
 </style>
 </head>
 <body>
-<h1>Cambridge Jamat Times</h1>
-<p id="today"></p>
-<table id="times">
+<h1>Cambridge Mosque Jamat Times</h1>
+<p>Today's Date: <span id="todayDate"></span></p>
+<table id="jamatTable">
 <thead>
 <tr>
 <th>Mosque</th>
@@ -55,49 +54,52 @@
 <th>Isha</th>
 </tr>
 </thead>
-<tbody>
-<tr><td colspan="6">Loading today's jamat times...</td></tr>
+<tbody id="tableBody">
+<tr><td colspan="6">Loading data...</td></tr>
 </tbody>
 </table>
+<div class="error" id="errorMsg"></div>
 <script>
-   // 1. Display today's date
-   const today = new Date();
-   const todayStr = today.toLocaleDateString("en-GB"); // format: DD/MM/YYYY
-   document.getElementById("today").textContent = `Today's Date: ${todayStr}`;
-   // 2. Your Google Sheet CSV link
-   const sheetUrl = "https://docs.google.com/spreadsheets/d/1dUXSVifdaugwxLGK1kG8a3r3Y-QWAJ1mB-JVnXsofXk/gviz/tq?tqx=out:csv";
-   // 3. Fetch and display data
-   fetch(sheetUrl)
-     .then(res => res.text())
-     .then(csv => {
+   const sheetUrl = "https://docs.google.com/spreadsheets/d/1Vxvd7weNO-WDBZqEw9GbOxziPrq_0mq1ZkBL7eyuqLs/gviz/tq?tqx=out:csv";
+   document.getElementById("todayDate").textContent = new Date().toLocaleDateString("en-GB");
+   async function loadData() {
+     try {
+       const response = await fetch(sheetUrl);
+       if (!response.ok) throw new Error("Failed to load Google Sheet");
+       const csv = await response.text();
        const rows = csv.split("\n").map(r => r.split(","));
-       const tbody = document.querySelector("#times tbody");
-       tbody.innerHTML = ""; // clear "loading" row
-       let found = false;
-       rows.slice(1).forEach(row => {
-         const date = row[0]?.trim();
-         if (date === todayStr) {
-           const tr = document.createElement("tr");
-           tr.innerHTML = `
-<td>${row[1] || ""}</td>
-<td>${row[2] || ""}</td>
-<td>${row[3] || ""}</td>
-<td>${row[4] || ""}</td>
-<td>${row[5] || ""}</td>
-<td>${row[6] || ""}</td>
-           `;
-           tbody.appendChild(tr);
-           found = true;
-         }
-       });
-       if (!found) {
-         tbody.innerHTML = `<tr><td colspan="6">No jamat times found for today.</td></tr>`;
+       const today = new Date().toLocaleDateString("en-GB");
+       const tbody = document.getElementById("tableBody");
+       const dateCol = rows[0].indexOf("Date");
+       const fajrCol = rows[0].indexOf("Fajr");
+       const dhuhrCol = rows[0].indexOf("Dhuhr");
+       const asrCol = rows[0].indexOf("Asr");
+       const maghribCol = rows[0].indexOf("Maghrib");
+       const ishaCol = rows[0].indexOf("Isha");
+       const mosqueCol = rows[0].indexOf("Mosque");
+       const todayRows = rows.filter(r => r[dateCol] === today);
+       tbody.innerHTML = "";
+       if (todayRows.length === 0) {
+         tbody.innerHTML = `<tr><td colspan="6">No times found for ${today}</td></tr>`;
+         return;
        }
-     })
-     .catch(err => {
-       console.error("Error loading sheet:", err);
-       document.querySelector("#times tbody").innerHTML = `<tr><td colspan="6">Error loading data.</td></tr>`;
-     });
+       todayRows.forEach(r => {
+         const tr = document.createElement("tr");
+         tr.innerHTML = `
+<td>${r[mosqueCol]}</td>
+<td>${r[fajrCol]}</td>
+<td>${r[dhuhrCol]}</td>
+<td>${r[asrCol]}</td>
+<td>${r[maghribCol]}</td>
+<td>${r[ishaCol]}</td>
+         `;
+         tbody.appendChild(tr);
+       });
+     } catch (err) {
+       document.getElementById("errorMsg").textContent = "⚠️ Error loading data — please check your Google Sheet is 'Anyone with the link can view'.";
+     }
+   }
+   loadData();
 </script>
 </body>
 </html>
