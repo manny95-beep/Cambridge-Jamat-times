@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cambridge Jamat Times</title>
+<style>
+
+    body {
+
+      font-family: Arial, sans-serif;
+
+      background: #f4f4f4;
+
+      color: #333;
+
+      margin: 0;
+
+      padding: 20px;
+
+    }
+
+    h1 {
+
+      text-align: center;
+
+    }
+
+    .date {
+
+      text-align: center;
+
+      margin-bottom: 30px;
+
+      font-size: 20px;
+
+    }
+
+    .mosque {
+
+      background: white;
+
+      padding: 15px;
+
+      border-radius: 6px;
+
+      margin-bottom: 15px;
+
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+    }
+
+    .mosque h2 {
+
+      margin: 0 0 10px 0;
+
+      color: #00796b;
+
+    }
+</style>
+</head>
+<body>
+<h1>Cambridge Jamat Times</h1>
+<div class="date" id="today-date"></div>
+<div class="mosque">
+<h2>Omar Faruque Mosque</h2>
+<p>Loading today's jamat times...</p>
+<a href="https://www.omarfaruquemosque.org.uk/index.php?section=1" target="_blank">View mosque site</a>
+</div>
+<div class="mosque">
+<h2>Cambridge Central Mosque</h2>
+<p>Loading today's jamat times...</p>
+<a href="https://cambridgecentralmosque.org/" target="_blank">View mosque site</a>
+</div>
+<div class="mosque">
+<h2>Abu Bakr Mosque (Cambridge Mosque)</h2>
+<p>Loading today's jamat times...</p>
+<a href="https://www.cambridgemosque.com/" target="_blank">View mosque site</a>
+</div>
+<div class="mosque">
+<h2>Cambridge Islamic Centre</h2>
+<p>Loading today's jamat times...</p>
+<a href="https://cambridgeislamiccentre.org/" target="_blank">View mosque site</a>
+</div>
+<script>
+
+    // Show today's date
+
+    const today = new Date();
+
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+    document.getElementById('today-date').textContent = today.toLocaleDateString('en-GB', options);
+</script>
+</body>
+</html>
+ 
