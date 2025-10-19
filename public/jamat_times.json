@@ -1,17 +1,17 @@
 {
-    "date": "2025-10-19",
-    "mosques": [
-        {
-            "mosque": "Cambridge Central Mosque",
-            "times": {}
-        },
-        {
-            "mosque": "Mill Road Mosque",
-            "times": {}
-        },
-        {
-            "mosque": "Omar Faruque Mosque",
-            "times": {}
-        }
-    ]
+  "date": "2025-10-19",
+  "mosques": [
+    {
+      "mosque": "Cambridge Central Mosque",
+      "error": "HTTPSConnectionPool(host='cambridgecentralmosque.org', port=443): Max retries exceeded with url: /prayer-times/ (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 404 Not Found')))"
+    },
+    {
+      "mosque": "Cambridge Mosque (Mill Road)",
+      "error": "HTTPSConnectionPool(host='prayer.cambridgemosque.com', port=443): Max retries exceeded with url: / (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 404 Not Found')))"
+    },
+    {
+      "mosque": "Omar Faruque Mosque",
+      "error": "403 Client Error: Forbidden for url: http://www.omarfaruquemosque.org.uk/"
+    }
+  ]
 }
